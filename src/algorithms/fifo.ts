@@ -1,6 +1,6 @@
 import { Result, Process } from "../@types";
 
-const fifo = (processes: Process[]): Result => {
+export const fifo = (processes: Process[]): any[] => {
   /* Ordena os processos por tempo de entrada */
   const sortedProcess = processes.sort(
     (esquerda, direita) => esquerda.tempoEntrada - direita.tempoEntrada
@@ -16,10 +16,20 @@ const fifo = (processes: Process[]): Result => {
     sum += clock - process.tempoEntrada;
   }
 
-  return {
-    ordemExec: sortedProcess,
-    tempoTotal: sum / sortedProcess.length,
-  };
-};
+  const handledProcess = sortedProcess.map((process, index) => {
+    clock += process.tempoExec;
+    sum += clock - process.tempoEntrada;
 
-export { fifo };
+    return [
+      `task${index}`,
+      `task${index}`,
+      new Date(2020, 1, 1, 1, 0, process.tempoEntrada),
+      new Date(2020, 1, 1, 1, 0, process.tempoExec),
+      null,
+      100,
+      null,
+    ];
+  });
+
+  return handledProcess;
+};
