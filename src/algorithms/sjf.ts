@@ -3,7 +3,7 @@ import { Result, Process } from "../@types";
 const sjf = (processes: Process[]): Result => {
   /* Ordena os processos por tempo de execução */
   const sortedProcess = processes.sort(
-    (esquerda, direita) => esquerda.tempoExec - direita.tempoExec
+    (esquerda, direita) => esquerda.tempoExecucao - direita.tempoExecucao
   );
 
   /* Tempo de execução do processo */
@@ -14,15 +14,15 @@ const sjf = (processes: Process[]): Result => {
   sortedProcess.forEach(() => {
     let executado: Process | null = null;
     for (const toExecute of sortedProcess) {
-      if (toExecute.tempoEntrada <= clock && toExecute.tempoEntrada >= 0) {
+      if (toExecute.tempoChegada <= clock && toExecute.tempoChegada >= 0) {
         executado = toExecute;
         break;
       }
       continue;
     }
     if (executado) {
-      clock += executado.tempoExec;
-      sum += clock - executado.tempoEntrada;
+      clock += executado.tempoExecucao;
+      sum += clock - executado.tempoChegada;
     }
   });
 

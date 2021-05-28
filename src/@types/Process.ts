@@ -1,4 +1,6 @@
 export interface Process {
-  tempoExec: number;
-  tempoEntrada: number;
+  tempoExecucao: number;
+  deadLine?: number;
+  sobrecargaDoSistema?: number;
+  tempoChegada: number;
 }

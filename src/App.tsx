@@ -1,8 +1,10 @@
-import { Button, Container, makeStyles, TextField } from "@material-ui/core";
-import { useState, FormEvent } from "react";
+import { Container, makeStyles } from "@material-ui/core";
+import React, { useState, FormEvent } from "react";
 import { Process } from "./@types";
 import Chart from "react-google-charts";
 import { fifo } from "./algorithms/fifo";
+import { AlgorithmSelector } from "./components/select";
+import ProcessTable from "./components/processTable";
 
 const useStyles = makeStyles(() => ({
   flex: {
@@ -19,19 +21,18 @@ function App() {
   const [processos, setProcessos] = useState<Process[]>([]);
   const [ganttProcess, setGanttProcess] = useState<any[]>([]);
 
-  const [tempoDeChegada, setTempoDeChegada] = useState("");
-  const [tempoDeExecucao, setTempoDeExecucao] = useState("");
-  const [deadLine, setDeadLine] = useState("");
-  const [prioridade, setPrioridade] = useState("");
-  const [sobrecargaDoSistema, setSobrecargaDoSistema] = useState("");
+  const tempoChegada = useState("");
+  const tempoExecucao = useState("");
+  const deadLine = useState("");
+  const sobrecargaDoSistema = useState("");
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     setProcessos([
       ...processos,
       {
-        tempoEntrada: parseFloat(tempoDeChegada),
-        tempoExec: parseFloat(tempoDeExecucao),
+        tempoChegada: parseFloat(tempoChegada[0]),
+        tempoExecucao: parseFloat(tempoExecucao[0]),
       },
     ]);
 
@@ -45,52 +46,18 @@ function App() {
   }
 
   return (
-    <>
+    <div className={classes.flex}>
       <Container>
-        <form onSubmit={onSubmit}>
-          <TextField
-            name="Tempo de Chegada"
-            label="Tempo de Chegada"
-            variant="filled"
-            value={tempoDeChegada}
-            onChange={(event) => setTempoDeChegada(event.target.value)}
-          />
-          <TextField
-            name="Tempo de Execução"
-            label="Tempo de Execução"
-            variant="filled"
-            value={tempoDeExecucao}
-            onChange={(event) => setTempoDeExecucao(event.target.value)}
-          />
-          <TextField
-            name="DeadLine"
-            label="DeadLine"
-            variant="filled"
-            value={deadLine}
-            onChange={(event) => setDeadLine(event.target.value)}
-          />
-          <TextField
-            name="Prioridade"
-            label="Prioridade"
-            variant="filled"
-            value={prioridade}
-            onChange={(event) => setPrioridade(event.target.value)}
-          />
-          <TextField
-            name="Sobrecarga do sistema"
-            label="Sobrecarga do sistema"
-            variant="filled"
-            value={sobrecargaDoSistema}
-            onChange={(event) => setSobrecargaDoSistema(event.target.value)}
-          />
-          <Button type="submit">Criar processo</Button>
-        </form>
-
-        <Button type="button" onClick={callFIFO}>
-          Executar fifo
-        </Button>
+        <AlgorithmSelector
+          callFifo={callFIFO}
+          onSubmit={onSubmit}
+          deadline={deadLine}
+          sobrecargaDoSistema={sobrecargaDoSistema}
+          tempoChegada={tempoChegada}
+          tempoExecucao={tempoExecucao}
+        />
+        {processos.length > 0 && <ProcessTable process={processos} />}
       </Container>
-
       {!!ganttProcess.length && (
         <Chart
           width={"100%"}
@@ -118,7 +85,7 @@ function App() {
           rootProps={{ "data-testid": "2" }}
         />
       )}
-    </>
+    </div>
   );
 }
 
