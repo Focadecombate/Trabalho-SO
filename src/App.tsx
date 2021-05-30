@@ -7,6 +7,7 @@ import { AlgorithmSelector } from "./components/select";
 import ProcessTable from "./components/processTable";
 import { sjf } from "./algorithms/sjf";
 import { roundRobin } from "./algorithms/round-robin";
+import { edf } from "./algorithms/edf";
 
 const useStyles = makeStyles(() => ({
   flex: {
@@ -37,11 +38,11 @@ function App() {
         setGanttProcess(sjf(processos));
         break;
       case "EDF":
+        console.log("opa");
+        setGanttProcess(edf(processos));
         break;
       case "Round-Robin":
-        setGanttProcess(
-          roundRobin(parseInt(quantum[0], 10), processos)
-        );
+        setGanttProcess(roundRobin(parseInt(quantum[0], 10), processos));
         break;
       default:
         setGanttProcess(fifo(processos));
