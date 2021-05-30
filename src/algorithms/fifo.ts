@@ -17,13 +17,16 @@ export const fifo = (processes: Process[]): any[] => {
       sortedProcess
         .slice(0, index)
         .reduce((prev, curr) => prev + curr.tempoExecucao, 0) -
-        processes[index].tempoChegada
+        sortedProcess[index].tempoChegada
     );
+
     executionTime.push(
       sortedProcess[index].tempoExecucao +
         awaitTime[index] +
         sortedProcess[index].tempoChegada
     );
+    console.log(awaitTime);
+    console.log(executionTime);
   }
 
   const handledProcess = sortedProcess.map((process, index) => [
@@ -38,3 +41,21 @@ export const fifo = (processes: Process[]): any[] => {
 
   return handledProcess;
 };
+
+fifo([
+  {
+    tempoChegada: 0,
+    tempoExecucao: 3,
+    deadLine: 0,
+  },
+  {
+    tempoChegada: 3,
+    tempoExecucao: 1,
+    deadLine: 0,
+  },
+  {
+    tempoChegada: 2,
+    tempoExecucao: 2,
+    deadLine: 0,
+  },
+]);

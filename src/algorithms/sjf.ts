@@ -3,45 +3,43 @@ import { Process } from "../@types";
 const sjf = (processes: Process[]): any[] => {
   /* Ordena os processos por tempo de execução */
 
-  const processesWithOrder = processes.map((value, index) => ({
-    ...value,
-    nProcesso: index,
-  }));
+  const sortedProcess = processes
+    .map((value, index) => ({
+      ...value,
+      nProcesso: index,
+      executed: false,
+    }))
+    .sort(
+      (esquerda, direita) => esquerda.tempoExecucao - direita.tempoExecucao
+    );
 
-  const sortedProcess = processesWithOrder.sort(
-    (esquerda, direita) => esquerda.tempoExecucao - direita.tempoExecucao
-  );
-
-  /* Tempo de execução do processo */
   let clock = 0;
-  /* Tempo final de execução da pilha */
-  let sum = 0;
+  const handledProcess: any[] = [];
 
-  sortedProcess.forEach(() => {
-    let executado: Process | null = null;
-    for (const toExecute of sortedProcess) {
-      if (toExecute.tempoChegada <= clock && toExecute.tempoChegada >= 0) {
-        executado = toExecute;
-        break;
+  while (sortedProcess.some((value) => value.executed === false)) {
+    for (let index = 0; index < sortedProcess.length; index++) {
+      const element = sortedProcess[index];
+
+      if (!sortedProcess[index].executed && clock >= element.tempoChegada) {
+        sortedProcess[index] = { ...sortedProcess[index], executed: true };
+        console.log(element.nProcesso);
+
+        clock += element.tempoExecucao;
+
+        handledProcess.push([
+          `Processo ${element.nProcesso}`,
+          `Processo ${element.nProcesso}`,
+          new Date(2020, 1, 1, 1, 0, clock - element.tempoExecucao),
+          new Date(2020, 1, 1, 1, 0, clock),
+          null,
+          100,
+          null,
+        ]);
       }
-      continue;
     }
-    if (executado) {
-      clock += executado.tempoExecucao;
-      sum += clock - executado.tempoChegada;
-      console.log(sum);
-    }
-  });
+  }
 
-  return sortedProcess.map((process) => [
-    `Processo ${process.nProcesso}`,
-    `Processo ${process.nProcesso}`,
-    new Date(2020, 1, 1, 1, 0, process.tempoChegada),
-    new Date(2020, 1, 1, 1, 0, process.tempoExecucao),
-    null,
-    100,
-    null,
-  ]);
+  return handledProcess;
 };
 
 export { sjf };
