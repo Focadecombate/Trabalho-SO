@@ -5,6 +5,8 @@ import Chart from "react-google-charts";
 import { fifo } from "./algorithms/fifo";
 import { AlgorithmSelector } from "./components/select";
 import ProcessTable from "./components/processTable";
+import { sjf } from "./algorithms/sjf";
+import { roundRobin } from "./algorithms/round-robin";
 
 const useStyles = makeStyles(() => ({
   flex: {
@@ -26,35 +28,55 @@ function App() {
   const deadLine = useState("");
   const sobrecargaDoSistema = useState("");
 
+  const execute = (algo: string) => {
+    switch (algo) {
+      case "FIFO":
+        setGanttProcess(fifo(processos));
+        break;
+      case "SJF":
+        setGanttProcess(sjf(processos));
+        break;
+      case "EDF":
+        break;
+      case "Round-Robin":
+        setGanttProcess(
+          roundRobin(parseInt(sobrecargaDoSistema[0], 10), processos)
+        );
+        break;
+      default:
+        setGanttProcess(fifo(processos));
+        break;
+    }
+  };
+
+  const clearProcess = () => {
+    setProcessos([]);
+    setGanttProcess([]);
+  };
+
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     setProcessos([
       ...processos,
       {
-        tempoChegada: parseFloat(tempoChegada[0]),
-        tempoExecucao: parseFloat(tempoExecucao[0]),
+        tempoChegada: parseInt(tempoChegada[0]),
+        tempoExecucao: parseInt(tempoExecucao[0]),
+        deadLine: parseInt(deadLine[0] ?? 0),
       },
     ]);
-
-    console.log(processos);
-  }
-
-  function callFIFO() {
-    setGanttProcess(fifo(processos));
-
-    console.log(ganttProcess);
   }
 
   return (
     <div className={classes.flex}>
       <Container>
         <AlgorithmSelector
-          callFifo={callFIFO}
+          execute={execute}
           onSubmit={onSubmit}
           deadline={deadLine}
           sobrecargaDoSistema={sobrecargaDoSistema}
           tempoChegada={tempoChegada}
           tempoExecucao={tempoExecucao}
+          clear={clearProcess}
         />
         {processos.length > 0 && <ProcessTable process={processos} />}
       </Container>

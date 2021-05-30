@@ -1,8 +1,14 @@
-import { Result, Process } from "../@types";
+import { Process } from "../@types";
 
-const sjf = (processes: Process[]): Result => {
+const sjf = (processes: Process[]): any[] => {
   /* Ordena os processos por tempo de execução */
-  const sortedProcess = processes.sort(
+
+  const processesWithOrder = processes.map((value, index) => ({
+    ...value,
+    nProcesso: index,
+  }));
+
+  const sortedProcess = processesWithOrder.sort(
     (esquerda, direita) => esquerda.tempoExecucao - direita.tempoExecucao
   );
 
@@ -26,10 +32,15 @@ const sjf = (processes: Process[]): Result => {
     }
   });
 
-  return {
-    ordemExec: sortedProcess,
-    tempoTotal: sum / sortedProcess.length,
-  };
+  return sortedProcess.map((process) => [
+    `Processo ${process.nProcesso}`,
+    `Processo ${process.nProcesso}`,
+    new Date(2020, 1, 1, 1, 0, process.tempoChegada),
+    new Date(2020, 1, 1, 1, 0, process.tempoExecucao),
+    null,
+    100,
+    null,
+  ]);
 };
 
 export { sjf };

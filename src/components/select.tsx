@@ -1,5 +1,5 @@
 import { Container, TextField, Button, makeStyles } from "@material-ui/core";
-import React, { FormEvent } from "react";
+import { FormEvent, useState, ChangeEvent, useEffect } from "react";
 import { Selector } from "./selector";
 
 interface Props {
@@ -8,18 +8,21 @@ interface Props {
   sobrecargaDoSistema: [string, (value: string) => void];
   deadline: [string, (value: string) => void];
   tempoExecucao: [string, (value: string) => void];
-  callFifo: () => void;
+  execute: (algo: string) => void;
+  clear: () => void;
 }
 
 const useStyles = makeStyles(() => ({
   flex: {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
     alignItems: "stretch",
-    padding: "2%",
+    padding: "3%",
+    flexDirection: "column",
   },
   container: {
+    padding: "5%",
+    flexDirection: "column",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -33,17 +36,51 @@ export const AlgorithmSelector = ({
   deadline,
   sobrecargaDoSistema,
   tempoChegada,
-  callFifo,
+  execute,
   tempoExecucao,
+  clear,
 }: Props) => {
-  const [algorithm, setAlgorithm] = React.useState("");
+  const [algorithm, setAlgorithm] = useState("");
+  const [showDeadline, setShowDeadline] = useState(false);
+  const [showQuantum, setShowQuantum] = useState(false);
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleChange = (event: ChangeEvent<{ value: unknown }>) => {
     setAlgorithm(event.target.value as string);
   };
+
+  useEffect(() => {
+    if (algorithm === "EDF") {
+      setShowDeadline(true);
+      setShowQuantum(false);
+      return;
+    }
+    if (algorithm === "Round-Robin") {
+      setShowQuantum(true);
+      setShowDeadline(false);
+      return;
+    }
+    setShowQuantum(false);
+    setShowDeadline(false);
+  }, [algorithm]);
+
   const classes = useStyles();
   return (
     <Container className={classes.container}>
+      <Selector
+        handleChange={handleChange}
+        state={algorithm}
+        label="Algoritimos"
+        values={Algoritimos}
+      />
+      {showQuantum && (
+        <TextField
+          name="Sobrecarga do sistema"
+          label="Sobrecarga do sistema"
+          variant="filled"
+          value={sobrecargaDoSistema[0]}
+          onChange={(event) => sobrecargaDoSistema[1](event.target.value)}
+        />
+      )}
       <form className={classes.flex} onSubmit={onSubmit}>
         <TextField
           name="Tempo de Chegada"
@@ -59,36 +96,36 @@ export const AlgorithmSelector = ({
           value={tempoExecucao[0]}
           onChange={(event) => tempoExecucao[1](event.target.value)}
         />
-        <TextField
-          name="DeadLine"
-          label="DeadLine"
-          variant="filled"
-          value={deadline[0]}
-          onChange={(event) => deadline[1](event.target.value)}
-        />
-        <TextField
-          name="Sobrecarga do sistema"
-          label="Sobrecarga do sistema"
-          variant="filled"
-          value={sobrecargaDoSistema[0]}
-          onChange={(event) => sobrecargaDoSistema[1](event.target.value)}
-        />
+        {showDeadline && (
+          <TextField
+            name="DeadLine"
+            label="DeadLine"
+            variant="filled"
+            value={deadline[0]}
+            onChange={(event) => deadline[1](event.target.value)}
+          />
+        )}
+
         <Button type="submit">Criar processo</Button>
+      </form>
+      <div>
         <Button
           type="button"
           variant="contained"
           color="primary"
-          onClick={callFifo}
+          onClick={() => execute(algorithm)}
         >
           Executar
         </Button>
-      </form>
-      <Selector
-        handleChange={handleChange}
-        state={algorithm}
-        label="Algoritimos"
-        values={Algoritimos}
-      />
+        <Button
+          type="button"
+          variant="contained"
+          color="secondary"
+          onClick={() => clear()}
+        >
+          Limpar
+        </Button>
+      </div>
     </Container>
   );
 };

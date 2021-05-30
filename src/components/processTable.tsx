@@ -11,7 +11,7 @@ import { Process } from "../@types";
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 650,
+    minWidth: 600,
   },
   root: {
     margin: "2%",
@@ -24,6 +24,7 @@ interface Props {
 
 export default function ProcessTable({ process }: Props) {
   const classes = useStyles();
+  console.log(process);
 
   return (
     <TableContainer className={classes.root} component={Paper}>
@@ -31,10 +32,9 @@ export default function ProcessTable({ process }: Props) {
         <TableHead>
           <TableRow>
             <TableCell>Ordem de Chegada</TableCell>
-            <TableCell align="right">Tempo de Chegada</TableCell>
-            <TableCell align="right">Tempo de Execução</TableCell>
-            <TableCell align="right">Deadline</TableCell>
-            <TableCell align="right">Sobrecarga do sistema</TableCell>
+            <TableCell>Tempo de Chegada</TableCell>
+            <TableCell>Tempo de Execução</TableCell>
+            {process[0].deadLine && <TableCell>Deadline</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -43,12 +43,9 @@ export default function ProcessTable({ process }: Props) {
               <TableCell component="th" scope="row">
                 {index}
               </TableCell>
-              <TableCell align="right">{row.tempoChegada}</TableCell>
-              <TableCell align="right">{row.tempoExecucao}</TableCell>
-              <TableCell align="right">{row.deadLine ?? 0}</TableCell>
-              <TableCell align="right">
-                {row.sobrecargaDoSistema ?? 0}
-              </TableCell>
+              <TableCell>{row.tempoChegada}</TableCell>
+              <TableCell>{row.tempoExecucao}</TableCell>
+              {row.deadLine && <TableCell>{row.deadLine}</TableCell>}
             </TableRow>
           ))}
         </TableBody>
