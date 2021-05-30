@@ -1,6 +1,8 @@
 import { Process } from "../@types";
 
-export const fifo = (processes: Process[]): any[] => {
+export const fifo = (
+  processes: Process[]
+): { process: any[]; turnround: number } => {
   /* Ordena os processos por tempo de entrada */
   const sortedProcess = processes
     .map((value, index) => ({
@@ -31,7 +33,6 @@ export const fifo = (processes: Process[]): any[] => {
     console.log(awaitTime);
     console.log(executionTime);
   }
-
   /* Prepara o processo pro grafico gant */
   const handledProcess = sortedProcess.map((process, index) => [
     `Processo ${process.nProcesso}`,
@@ -43,23 +44,8 @@ export const fifo = (processes: Process[]): any[] => {
     null,
   ]);
 
-  return handledProcess;
+  return {
+    process: handledProcess,
+    turnround: executionTime[executionTime.length - 1],
+  };
 };
-
-fifo([
-  {
-    tempoChegada: 0,
-    tempoExecucao: 3,
-    deadLine: 0,
-  },
-  {
-    tempoChegada: 3,
-    tempoExecucao: 1,
-    deadLine: 0,
-  },
-  {
-    tempoChegada: 2,
-    tempoExecucao: 2,
-    deadLine: 0,
-  },
-]);

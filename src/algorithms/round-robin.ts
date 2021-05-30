@@ -38,7 +38,7 @@ const roundRobin = (quantum: number, processes: Process[]) => {
     }
   }
 
-  return executedProcess;
+  return { process: executedProcess, turnround: clock };
 };
 
 export { roundRobin };

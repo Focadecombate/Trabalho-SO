@@ -1,6 +1,6 @@
 import { Process } from "../@types";
 
-const sjf = (processes: Process[]): any[] => {
+const sjf = (processes: Process[]): { process: any[]; turnround: number } => {
   /* Ordena os processos por tempo de execução */
 
   const sortedProcess = processes
@@ -43,8 +43,7 @@ const sjf = (processes: Process[]): any[] => {
       }
     }
   }
-
-  return handledProcess;
+  return { process: handledProcess, turnround: clock };
 };
 
 export { sjf };

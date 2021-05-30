@@ -64,10 +64,9 @@ const edf = (processes: Process[]) => {
           clock += possibleExecutionTime;
           partialExecution[index] -= possibleExecutionTime;
         }
-        console.log(partialExecution);
       }
     }
   }
-  return executedProcess;
+  return { process: executedProcess, turnround: clock };
 };
 export { edf };

@@ -1,4 +1,4 @@
-import { Container, makeStyles } from "@material-ui/core";
+import { Container, makeStyles, Typography } from "@material-ui/core";
 import React, { useState, FormEvent } from "react";
 import { Process } from "./@types";
 import Chart from "react-google-charts";
@@ -25,6 +25,7 @@ function App() {
   const [ganttProcess, setGanttProcess] = useState<any[]>([]);
 
   const tempoChegada = useState("");
+  const [turnRound, setTurnRound] = useState(0);
   const tempoExecucao = useState("");
   const deadLine = useState("");
   const sobrescricaoDoSistema = useState("");
@@ -33,20 +34,36 @@ function App() {
   const execute = (algo: string) => {
     switch (algo) {
       case "FIFO":
-        setGanttProcess(fifo(processos));
+        const { process: fifoProcess, turnround: fifoTurnRound } =
+          fifo(processos);
+
+        setGanttProcess(fifoProcess);
+        setTurnRound(fifoTurnRound / fifoProcess.length);
         break;
       case "SJF":
-        setGanttProcess(sjf(processos));
+        const { process: sjfProcessos, turnround: sjfTurnRound } =
+          sjf(processos);
+        setGanttProcess(sjfProcessos);
+        setTurnRound(sjfTurnRound / sjfProcessos.length);
         break;
       case "EDF":
-        console.log("opa");
-        setGanttProcess(edf(processos));
+        const { process: EDFprocess, turnround: EDFturnround } = edf(processos);
+        setGanttProcess(EDFprocess);
+        setTurnRound(EDFturnround / EDFprocess.length);
         break;
       case "Round-Robin":
-        setGanttProcess(roundRobin(parseInt(quantum[0], 10), processos));
+        const { process: RRProcess, turnround: RRTurnRound } = roundRobin(
+          parseInt(quantum[0], 10),
+          processos
+        );
+        setGanttProcess(RRProcess);
+        setTurnRound(RRTurnRound / RRProcess.length);
         break;
       default:
-        setGanttProcess(fifo(processos));
+        const { process: defaultProcess, turnround: defaultTurnRound } =
+          fifo(processos);
+        setGanttProcess(defaultProcess);
+        setTurnRound(defaultTurnRound / defaultProcess.length);
         break;
     }
   };
@@ -83,6 +100,7 @@ function App() {
           sobrescricaoDoSistema={sobrescricaoDoSistema}
           clear={clearProcess}
         />
+        <Typography variant="h5">Turnround:{turnRound}</Typography>
         {processos.length > 0 && <ProcessTable process={processos} />}
       </Container>
       {!!ganttProcess.length && (
