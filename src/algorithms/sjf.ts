@@ -29,6 +29,7 @@ const sjf = (processes: Process[]): any[] => {
     if (executado) {
       clock += executado.tempoExecucao;
       sum += clock - executado.tempoChegada;
+      console.log(sum);
     }
   });
 

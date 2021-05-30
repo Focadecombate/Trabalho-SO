@@ -26,7 +26,7 @@ function App() {
   const tempoChegada = useState("");
   const tempoExecucao = useState("");
   const deadLine = useState("");
-  const sobrecargaDoSistema = useState("");
+  const quantum = useState("");
 
   const execute = (algo: string) => {
     switch (algo) {
@@ -40,7 +40,7 @@ function App() {
         break;
       case "Round-Robin":
         setGanttProcess(
-          roundRobin(parseInt(sobrecargaDoSistema[0], 10), processos)
+          roundRobin(parseInt(quantum[0], 10), processos)
         );
         break;
       default:
@@ -56,12 +56,14 @@ function App() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
+    const parsedDeadLine = parseInt(deadLine[0]);
+
     setProcessos([
       ...processos,
       {
         tempoChegada: parseInt(tempoChegada[0]),
         tempoExecucao: parseInt(tempoExecucao[0]),
-        deadLine: parseInt(deadLine[0] ?? 0),
+        deadLine: !isNaN(parsedDeadLine) ? parsedDeadLine : 0,
       },
     ]);
   }
@@ -73,7 +75,7 @@ function App() {
           execute={execute}
           onSubmit={onSubmit}
           deadline={deadLine}
-          sobrecargaDoSistema={sobrecargaDoSistema}
+          quantum={quantum}
           tempoChegada={tempoChegada}
           tempoExecucao={tempoExecucao}
           clear={clearProcess}

@@ -34,18 +34,18 @@ export default function ProcessTable({ process }: Props) {
             <TableCell>Ordem de Chegada</TableCell>
             <TableCell>Tempo de Chegada</TableCell>
             <TableCell>Tempo de Execução</TableCell>
-            {process[0].deadLine && <TableCell>Deadline</TableCell>}
+            <TableCell>Deadline</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {process.map((row, index) => (
-            <TableRow key={row.tempoChegada}>
+            <TableRow key={`${row.tempoChegada}${index}`}>
               <TableCell component="th" scope="row">
                 {index}
               </TableCell>
               <TableCell>{row.tempoChegada}</TableCell>
               <TableCell>{row.tempoExecucao}</TableCell>
-              {row.deadLine && <TableCell>{row.deadLine}</TableCell>}
+              <TableCell>{row.deadLine}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -5,7 +5,7 @@ import { Selector } from "./selector";
 interface Props {
   onSubmit(e: FormEvent): void;
   tempoChegada: [string, (value: string) => void];
-  sobrecargaDoSistema: [string, (value: string) => void];
+  quantum: [string, (value: string) => void];
   deadline: [string, (value: string) => void];
   tempoExecucao: [string, (value: string) => void];
   execute: (algo: string) => void;
@@ -34,7 +34,7 @@ const Algoritimos = ["SJF", "FIFO", "EDF", "Round-Robin"];
 export const AlgorithmSelector = ({
   onSubmit,
   deadline,
-  sobrecargaDoSistema,
+  quantum,
   tempoChegada,
   execute,
   tempoExecucao,
@@ -74,11 +74,11 @@ export const AlgorithmSelector = ({
       />
       {showQuantum && (
         <TextField
-          name="Sobrecarga do sistema"
-          label="Sobrecarga do sistema"
+          name="Quantum"
+          label="Quantum"
           variant="filled"
-          value={sobrecargaDoSistema[0]}
-          onChange={(event) => sobrecargaDoSistema[1](event.target.value)}
+          value={quantum[0]}
+          onChange={(event) => quantum[1](event.target.value)}
         />
       )}
       <form className={classes.flex} onSubmit={onSubmit}>

@@ -11,23 +11,27 @@ const roundRobin = (quantum: number, processes: Process[]) => {
   while (partialExecution.some((value) => value > 0)) {
     for (let index = 0; index < processes.length; index++) {
       if (partialExecution[index] > 0) {
-        executedProcess.push([
-          `${id} Processo ${index} `,
-          `${id} Processo ${index} `,
-          new Date(2020, 1, 1, 1, 0, clock),
-          new Date(2020, 1, 1, 1, 0, clock + quantum),
-          null,
-          100,
-          null,
-        ]);
-        id++;
-        clock = clock + quantum;
+        if (clock >= processes[index].tempoChegada) {
+          const aditionalTime =
+            quantum > partialExecution[index]
+              ? partialExecution[index]
+              : quantum;
+          executedProcess.push([
+            `${id} Processo ${index} `,
+            `${id} Processo ${index} `,
+            new Date(2020, 1, 1, 1, 0, clock),
+            new Date(2020, 1, 1, 1, 0, clock + aditionalTime),
+            null,
+            100,
+            null,
+          ]);
+          id++;
+          clock = clock + aditionalTime;
+          partialExecution[index] = partialExecution[index] - aditionalTime;
+        }
       }
     }
-    partialExecution = partialExecution.map((value) => value - quantum);
   }
-  console.log(executedProcess.length);
-  console.log(clock);
 
   return executedProcess;
 };
