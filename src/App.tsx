@@ -27,6 +27,7 @@ function App() {
   const tempoChegada = useState("");
   const tempoExecucao = useState("");
   const deadLine = useState("");
+  const sobrescricaoDoSistema = useState("");
   const quantum = useState("");
 
   const execute = (algo: string) => {
@@ -79,6 +80,7 @@ function App() {
           quantum={quantum}
           tempoChegada={tempoChegada}
           tempoExecucao={tempoExecucao}
+          sobrescricaoDoSistema={sobrescricaoDoSistema}
           clear={clearProcess}
         />
         {processos.length > 0 && <ProcessTable process={processos} />}

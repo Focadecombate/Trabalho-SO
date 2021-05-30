@@ -8,6 +8,7 @@ interface Props {
   quantum: [string, (value: string) => void];
   deadline: [string, (value: string) => void];
   tempoExecucao: [string, (value: string) => void];
+  sobrescricaoDoSistema: [string, (value: string) => void];
   execute: (algo: string) => void;
   clear: () => void;
 }
@@ -38,6 +39,7 @@ export const AlgorithmSelector = ({
   tempoChegada,
   execute,
   tempoExecucao,
+  sobrescricaoDoSistema,
   clear,
 }: Props) => {
   const [algorithm, setAlgorithm] = useState("");
@@ -95,6 +97,13 @@ export const AlgorithmSelector = ({
           variant="filled"
           value={tempoExecucao[0]}
           onChange={(event) => tempoExecucao[1](event.target.value)}
+        />
+        <TextField
+          name="Sobrescrição do Sistema"
+          label="Sobrescrição do Sistema"
+          variant="filled"
+          value={sobrescricaoDoSistema[0]}
+          onChange={(event) => sobrescricaoDoSistema[1](event.target.value)}
         />
         {showDeadline && (
           <TextField
