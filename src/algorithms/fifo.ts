@@ -9,9 +9,12 @@ export const fifo = (processes: Process[]): any[] => {
     }))
     .sort((esquerda, direita) => esquerda.tempoChegada - direita.tempoChegada);
 
+  /* Array com tempo de espera */
   const awaitTime: number[] = [];
+  /* Array com o tempo total de execução */
   const executionTime: number[] = [];
 
+  /* Loop que passa pelos processos ordenados e preenche os arrays */
   for (let index = 0; index < sortedProcess.length; index++) {
     awaitTime.push(
       sortedProcess
@@ -29,6 +32,7 @@ export const fifo = (processes: Process[]): any[] => {
     console.log(executionTime);
   }
 
+  /* Prepara o processo pro grafico gant */
   const handledProcess = sortedProcess.map((process, index) => [
     `Processo ${process.nProcesso}`,
     `Processo ${process.nProcesso}`,

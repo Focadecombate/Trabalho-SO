@@ -14,9 +14,12 @@ const edf = (processes: Process[]) => {
 
   const executedProcess: any[] = [];
 
+  /* Loop enquanto tiver algum processo sem estar completo */
   while (partialExecution.some((value) => value > 0)) {
+    /* Loop pelos processo */
     for (let index = 0; index < sortedProcess.length; index++) {
       const element = sortedProcess[index];
+      /* Checa se o processo já chegou e se ainda falta executar */
       if (clock >= element.tempoChegada && partialExecution[index] > 0) {
         if (index === 0) {
           executedProcess.push([
