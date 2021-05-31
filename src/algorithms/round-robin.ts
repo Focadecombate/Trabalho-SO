@@ -24,7 +24,7 @@ const roundRobin = (
   const executedProcess: Gantt[] = [];
 
   let clock = 0;
-  let id = 0;
+  let counter = 0;
   let sobrecargaFinal = 0;
 
   /* While que executa enquanto há processos que não foram executados por completo */
@@ -33,24 +33,29 @@ const roundRobin = (
     for (let index = 0; index < processWithId.length; index++) {
       /* Checa se ainda há tempo faltando e se o processo já chegou na fila */
       const currentPartial = partialExecution[index];
-      if (
-        currentPartial > 0 &&
-        arrived(processWithId[index].tempoChegada, clock)
-      ) {
+      const currentProcess = processWithId[index];
+      if (currentPartial > 0 && arrived(currentProcess.tempoChegada, clock)) {
         /* Tempo adicional que pode ser o quantum ou o tempo que falta no processo */
         const aditionalTime =
           quantum > currentPartial ? currentPartial : quantum;
+
+        const StartDate = createData(clock);
+        const EndDate = createData(clock + aditionalTime);
+
         executedProcess.push(
           createGantt({
-            TaskName: `Processo ${processWithId[index].index} `,
-            TaskID: `${id} Processo ${index}`,
-            StartDate: createData(clock),
-            EndDate: createData(clock + aditionalTime),
+            TaskName: `Processo ${currentProcess.index}`,
+            TaskID: `${counter} Processo ${currentProcess.index}`,
+            StartDate,
+            EndDate,
+            Duration: quantum,
           })
         );
-        id++;
-        clock = clock + aditionalTime;
-        partialExecution[index] = currentPartial - aditionalTime;
+        const updatedPartial = currentPartial - aditionalTime;
+
+        counter++;
+        clock += aditionalTime;
+        partialExecution[index] = updatedPartial;
       }
     }
   }
@@ -59,16 +64,16 @@ const roundRobin = (
 
   addSobrecargaQuantum(executedProcess, sobrecarga, ganttArray);
 
-  for (const process of ganttArray) {
+  const removeDuplications = Array.from(new Set(ganttArray));
+
+  for (const process of removeDuplications) {
     if (process.TaskName.includes("Sobrecarga")) {
       sobrecargaFinal += 2;
     }
   }
 
-  console.log(ganttArray);
-
   return {
-    process: toGanttArray(ganttArray),
+    process: toGanttArray(removeDuplications),
     turnround: clock + sobrecargaFinal,
   };
 };
