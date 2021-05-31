@@ -1,10 +1,11 @@
-import { Process } from "../@types";
+import { Process, Result } from "../@types";
+import { Gantt } from "../@types/gantt";
+import { createData, createGantt, toGanttArray } from "../utils/";
+import { addSobrecarga } from "../utils/addSobrecarga";
 
-export const fifo = (
-  processes: Process[]
-): { process: any[]; turnround: number } => {
+export const fifo = (processes: Process[], sobrecarga: number): Result => {
   /* Ordena os processos por tempo de entrada */
-  const sortedProcess = processes
+  const processosEmOrdem = processes
     .map((value, index) => ({
       ...value,
       nProcesso: index,
@@ -17,35 +18,38 @@ export const fifo = (
   const executionTime: number[] = [];
 
   /* Loop que passa pelos processos ordenados e preenche os arrays */
-  for (let index = 0; index < sortedProcess.length; index++) {
+
+  for (let index = 0; index < processosEmOrdem.length; index++) {
     awaitTime.push(
-      sortedProcess
+      processosEmOrdem
         .slice(0, index)
         .reduce((prev, curr) => prev + curr.tempoExecucao, 0) -
-        sortedProcess[index].tempoChegada
+        processosEmOrdem[index].tempoChegada
     );
 
     executionTime.push(
-      sortedProcess[index].tempoExecucao +
+      processosEmOrdem[index].tempoExecucao +
         awaitTime[index] +
-        sortedProcess[index].tempoChegada
+        processosEmOrdem[index].tempoChegada
     );
-    console.log(awaitTime);
-    console.log(executionTime);
   }
+
   /* Prepara o processo pro grafico gant */
-  const handledProcess = sortedProcess.map((process, index) => [
-    `Processo ${process.nProcesso}`,
-    `Processo ${process.nProcesso}`,
-    new Date(2020, 1, 1, 1, 0, process.tempoChegada + awaitTime[index]),
-    new Date(2020, 1, 1, 1, 0, executionTime[index]),
-    null,
-    100,
-    null,
-  ]);
+  const handledProcess = processosEmOrdem.map(
+    (process, index): Gantt =>
+      createGantt({
+        TaskName: `Processo ${process.nProcesso}`,
+        StartDate: createData(process.tempoChegada + awaitTime[index]),
+        EndDate: createData(executionTime[index]),
+      })
+  );
+
+  const ganttProcess: Gantt[] = [];
+
+  addSobrecarga(handledProcess, sobrecarga, ganttProcess);
 
   return {
-    process: handledProcess,
+    process: toGanttArray(ganttProcess),
     turnround: executionTime[executionTime.length - 1],
   };
 };

@@ -3,7 +3,7 @@ import React, { useState, FormEvent } from "react";
 import { Process } from "./@types";
 import Chart from "react-google-charts";
 import { fifo } from "./algorithms/fifo";
-import { AlgorithmSelector } from "./components/select";
+import { AlgorithmSelector } from "./components/algorithmSelector";
 import ProcessTable from "./components/processTable";
 import { sjf } from "./algorithms/sjf";
 import { roundRobin } from "./algorithms/round-robin";
@@ -32,19 +32,23 @@ function App() {
   const quantum = useState("");
 
   const execute = (algo: string) => {
+    const sobrecarga = parseInt(sobrescricaoDoSistema[0], 10);
     switch (algo) {
       case "FIFO":
-        const { process: fifoProcess, turnround: fifoTurnRound } =
-          fifo(processos);
-
+        const { process: fifoProcess, turnround: fifoTurnRound } = fifo(
+          processos,
+          sobrecarga
+        );
         setGanttProcess(fifoProcess);
-        setTurnRound(fifoTurnRound / fifoProcess.length);
+        setTurnRound(fifoTurnRound / (fifoProcess.length / 2));
         break;
       case "SJF":
-        const { process: sjfProcessos, turnround: sjfTurnRound } =
-          sjf(processos);
+        const { process: sjfProcessos, turnround: sjfTurnRound } = sjf(
+          processos,
+          sobrecarga
+        );
         setGanttProcess(sjfProcessos);
-        setTurnRound(sjfTurnRound / sjfProcessos.length);
+        setTurnRound(sjfTurnRound / (sjfProcessos.length / 2));
         break;
       case "EDF":
         const { process: EDFprocess, turnround: EDFturnround } = edf(processos);
@@ -54,14 +58,17 @@ function App() {
       case "Round-Robin":
         const { process: RRProcess, turnround: RRTurnRound } = roundRobin(
           parseInt(quantum[0], 10),
-          processos
+          processos,
+          sobrecarga
         );
         setGanttProcess(RRProcess);
         setTurnRound(RRTurnRound / RRProcess.length);
         break;
       default:
-        const { process: defaultProcess, turnround: defaultTurnRound } =
-          fifo(processos);
+        const { process: defaultProcess, turnround: defaultTurnRound } = fifo(
+          processos,
+          parseInt(sobrescricaoDoSistema[0])
+        );
         setGanttProcess(defaultProcess);
         setTurnRound(defaultTurnRound / defaultProcess.length);
         break;

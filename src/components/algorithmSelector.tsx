@@ -74,6 +74,13 @@ export const AlgorithmSelector = ({
         label="Algoritimos"
         values={Algoritimos}
       />
+      <TextField
+        name="Sobrescrição do Sistema"
+        label="Sobrescrição do Sistema"
+        variant="filled"
+        value={sobrescricaoDoSistema[0]}
+        onChange={(event) => sobrescricaoDoSistema[1](event.target.value)}
+      />
       {showQuantum && (
         <TextField
           name="Quantum"
@@ -97,13 +104,6 @@ export const AlgorithmSelector = ({
           variant="filled"
           value={tempoExecucao[0]}
           onChange={(event) => tempoExecucao[1](event.target.value)}
-        />
-        <TextField
-          name="Sobrescrição do Sistema"
-          label="Sobrescrição do Sistema"
-          variant="filled"
-          value={sobrescricaoDoSistema[0]}
-          onChange={(event) => sobrescricaoDoSistema[1](event.target.value)}
         />
         {showDeadline && (
           <TextField

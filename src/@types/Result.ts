@@ -1,6 +1,6 @@
-import { Process } from "./Process";
+import { GanttArray } from "./gantt";
 
 export interface Result {
-  tempoTotal: number;
-  ordemExec: Process[];
+  process: GanttArray[];
+  turnround: number;
 }

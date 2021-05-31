@@ -1,49 +1,69 @@
-import { Process } from "../@types";
+import {
+  Process,
+  Result,
+  Gantt,
+  ProcessWithExecutedAndNumber,
+} from "../@types";
+import { createData, createGantt, toGanttArray } from "../utils";
+import { addSobrecarga } from "../utils/addSobrecarga";
+import { arrived } from "../utils/arrived";
+import { naoRodouTodos } from "../utils/naoRodouTodos";
 
-const sjf = (processes: Process[]): { process: any[]; turnround: number } => {
+const comecaForaDoZero = (processes: ProcessWithExecutedAndNumber[]) =>
+  processes.every(
+    (value) => value.tempoChegada !== 0 && value.executado === false
+  );
+
+const sjf = (processes: Process[], sobrecarga: number): Result => {
   /* Ordena os processos por tempo de execução */
-
-  const sortedProcess = processes
+  const processosEmOrdem = processes
     .map((value, index) => ({
       ...value,
       nProcesso: index,
-      executed: false,
+      executado: false,
     }))
     .sort(
       (esquerda, direita) => esquerda.tempoExecucao - direita.tempoExecucao
     );
 
-  let clock = 0;
-  const handledProcess: any[] = [];
+  let relogio = 0;
+  const handledProcess: Gantt[] = [];
 
   /* Loop que roda enquanto algum processo não tiver sido executado */
-  while (sortedProcess.some((value) => value.executed === false)) {
+  while (naoRodouTodos(processosEmOrdem)) {
     /* Loop pelos processos q executa a logica */
-    for (let index = 0; index < sortedProcess.length; index++) {
-      const element = sortedProcess[index];
+    for (let index = 0; index < processosEmOrdem.length; index++) {
+      const { executado, tempoChegada, tempoExecucao, nProcesso } =
+        processosEmOrdem[index];
 
       /* check se o processo foi executado e se ele já chegou na fila */
-      if (!sortedProcess[index].executed && clock >= element.tempoChegada) {
+      if (!executado && arrived(tempoChegada, relogio)) {
         /* Marca como executado */
-        sortedProcess[index] = { ...sortedProcess[index], executed: true };
+        processosEmOrdem[index] = {
+          ...processosEmOrdem[index],
+          executado: true,
+        };
 
-        /* soma ao clock o valor do tempo de execução */
-        clock += element.tempoExecucao;
+        /* soma ao relogio o valor do tempo de execução */
+        relogio += tempoExecucao;
 
         /* array para o grafico gantt */
-        handledProcess.push([
-          `Processo ${element.nProcesso}`,
-          `Processo ${element.nProcesso}`,
-          new Date(2020, 1, 1, 1, 0, clock - element.tempoExecucao),
-          new Date(2020, 1, 1, 1, 0, clock),
-          null,
-          100,
-          null,
-        ]);
+        handledProcess.push(
+          createGantt({
+            TaskName: `Processo ${nProcesso}`,
+            StartDate: createData(relogio - tempoExecucao),
+            EndDate: createData(relogio),
+          })
+        );
+      }
+      if (comecaForaDoZero(processosEmOrdem)) {
+        relogio += tempoChegada;
       }
     }
   }
-  return { process: handledProcess, turnround: clock };
+  const ganttProcess: Gantt[] = [];
+  addSobrecarga(handledProcess, sobrecarga, ganttProcess);
+  return { process: toGanttArray(ganttProcess), turnround: relogio };
 };
 
 export { sjf };
