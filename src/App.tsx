@@ -1,6 +1,6 @@
 import { Container, makeStyles, Typography } from "@material-ui/core";
 import React, { useState, FormEvent } from "react";
-import { Process } from "./@types";
+import { GanttArray, Process } from "./@types";
 import Chart from "react-google-charts";
 import { fifo } from "./algorithms/fifo";
 import { AlgorithmSelector } from "./components/algorithmSelector";
@@ -22,23 +22,27 @@ function App() {
   const classes = useStyles();
 
   const [processos, setProcessos] = useState<Process[]>([]);
-  const [ganttProcess, setGanttProcess] = useState<any[]>([]);
+  const [ganttProcess, setGanttProcess] = useState<GanttArray[]>([]);
 
   const tempoChegada = useState("");
   const [turnRound, setTurnRound] = useState(0);
+
   const tempoExecucao = useState("");
+  const priority = useState("");
   const deadLine = useState("");
   const sobrescricaoDoSistema = useState("");
   const quantum = useState("");
 
   const execute = (algo: string) => {
     const sobrecarga = parseInt(sobrescricaoDoSistema[0], 10);
+    setGanttProcess([]);
     switch (algo) {
       case "FIFO":
         const { process: fifoProcess, turnround: fifoTurnRound } = fifo(
           processos,
           sobrecarga
         );
+
         setGanttProcess(fifoProcess);
         setTurnRound(fifoTurnRound / (fifoProcess.length / 2));
         break;
@@ -49,6 +53,12 @@ function App() {
         );
         setGanttProcess(sjfProcessos);
         setTurnRound(sjfTurnRound / (sjfProcessos.length / 2));
+        break;
+      case "Priority":
+        const { process: priorityProcessos, turnround: priorityTurnRound } =
+          sjf(processos, sobrecarga);
+        setGanttProcess(priorityProcessos);
+        setTurnRound(priorityTurnRound / (sjfProcessos.length / 2));
         break;
       case "EDF":
         const { process: EDFprocess, turnround: EDFturnround } = edf(
@@ -87,6 +97,7 @@ function App() {
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     const parsedDeadLine = parseInt(deadLine[0]);
+    const parsedPriority = parseInt(priority[0]);
 
     setProcessos([
       ...processos,
@@ -94,6 +105,7 @@ function App() {
         tempoChegada: parseInt(tempoChegada[0]),
         tempoExecucao: parseInt(tempoExecucao[0]),
         deadLine: !isNaN(parsedDeadLine) ? parsedDeadLine : 0,
+        priority: !isNaN(parsedPriority) ? parsedPriority : 0,
       },
     ]);
   }
@@ -108,6 +120,7 @@ function App() {
           quantum={quantum}
           tempoChegada={tempoChegada}
           tempoExecucao={tempoExecucao}
+          priority={priority}
           sobrescricaoDoSistema={sobrescricaoDoSistema}
           clear={clearProcess}
         />
@@ -134,6 +147,11 @@ function App() {
           ]}
           options={{
             height: 400,
+            animation: {
+              duration: 1000,
+              startup: true,
+              easing: "out",
+            },
             gantt: {
               trackHeight: 30,
             },

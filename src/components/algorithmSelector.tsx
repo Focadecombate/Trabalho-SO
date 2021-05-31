@@ -8,6 +8,7 @@ interface Props {
   quantum: [string, (value: string) => void];
   deadline: [string, (value: string) => void];
   tempoExecucao: [string, (value: string) => void];
+  priority: [string, (value: string) => void];
   sobrescricaoDoSistema: [string, (value: string) => void];
   execute: (algo: string) => void;
   clear: () => void;
@@ -30,7 +31,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Algoritimos = ["SJF", "FIFO", "EDF", "Round-Robin"];
+const Algoritimos = ["SJF", "FIFO", "EDF", "Round-Robin", "Priority"];
 
 export const AlgorithmSelector = ({
   onSubmit,
@@ -40,11 +41,13 @@ export const AlgorithmSelector = ({
   execute,
   tempoExecucao,
   sobrescricaoDoSistema,
+  priority,
   clear,
 }: Props) => {
   const [algorithm, setAlgorithm] = useState("");
   const [showDeadline, setShowDeadline] = useState(false);
   const [showQuantum, setShowQuantum] = useState(false);
+  const [showPriority, setShowPriority] = useState(false);
 
   const handleChange = (event: ChangeEvent<{ value: unknown }>) => {
     setAlgorithm(event.target.value as string);
@@ -53,14 +56,23 @@ export const AlgorithmSelector = ({
   useEffect(() => {
     if (algorithm === "EDF") {
       setShowDeadline(true);
+      setShowPriority(false);
       setShowQuantum(true);
       return;
     }
     if (algorithm === "Round-Robin") {
       setShowQuantum(true);
+      setShowPriority(false);
       setShowDeadline(false);
       return;
     }
+    if (algorithm === "Priority") {
+      setShowQuantum(false);
+      setShowDeadline(false);
+      setShowPriority(true);
+      return;
+    }
+    setShowPriority(false);
     setShowQuantum(false);
     setShowDeadline(false);
   }, [algorithm]);
@@ -112,6 +124,15 @@ export const AlgorithmSelector = ({
             variant="filled"
             value={deadline[0]}
             onChange={(event) => deadline[1](event.target.value)}
+          />
+        )}
+        {showPriority && (
+          <TextField
+            name="Prioridade"
+            label="Prioridade"
+            variant="filled"
+            value={priority[0]}
+            onChange={(event) => priority[1](event.target.value)}
           />
         )}
 
