@@ -51,7 +51,11 @@ function App() {
         setTurnRound(sjfTurnRound / (sjfProcessos.length / 2));
         break;
       case "EDF":
-        const { process: EDFprocess, turnround: EDFturnround } = edf(processos);
+        const { process: EDFprocess, turnround: EDFturnround } = edf(
+          parseInt(quantum[0]),
+          processos,
+          sobrecarga
+        );
         setGanttProcess(EDFprocess);
         setTurnRound(EDFturnround / EDFprocess.length);
         break;

@@ -53,7 +53,7 @@ export const AlgorithmSelector = ({
   useEffect(() => {
     if (algorithm === "EDF") {
       setShowDeadline(true);
-      setShowQuantum(false);
+      setShowQuantum(true);
       return;
     }
     if (algorithm === "Round-Robin") {
