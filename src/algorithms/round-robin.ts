@@ -60,21 +60,28 @@ const roundRobin = (
     }
   }
 
-  const ganttArray: Gantt[] = [];
+  if (sobrecarga > 0) {
+    const ganttArray: Gantt[] = [];
 
-  addSobrecargaQuantum(executedProcess, sobrecarga, ganttArray);
+    addSobrecargaQuantum(executedProcess, sobrecarga, ganttArray);
 
-  const removeDuplications = Array.from(new Set(ganttArray));
+    const removeDuplications = Array.from(new Set(ganttArray));
 
-  for (const process of removeDuplications) {
-    if (process.TaskName.includes("Sobrecarga")) {
-      sobrecargaFinal += 2;
+    for (const process of removeDuplications) {
+      if (process.TaskName.includes("Sobrecarga")) {
+        sobrecargaFinal += 2;
+      }
     }
+
+    return {
+      process: toGanttArray(removeDuplications),
+      turnround: clock + sobrecargaFinal,
+    };
   }
 
   return {
-    process: toGanttArray(removeDuplications),
-    turnround: clock + sobrecargaFinal,
+    process: toGanttArray(executedProcess),
+    turnround: clock,
   };
 };
 

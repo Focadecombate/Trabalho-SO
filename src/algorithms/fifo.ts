@@ -46,10 +46,17 @@ export const fifo = (processes: Process[], sobrecarga: number): Result => {
 
   const ganttProcess: Gantt[] = [];
 
-  addSobrecarga(handledProcess, sobrecarga, ganttProcess);
+  if (sobrecarga > 0) {
+    addSobrecarga(handledProcess, sobrecarga, ganttProcess);
+
+    return {
+      process: toGanttArray(ganttProcess),
+      turnround: executionTime[executionTime.length - 1],
+    };
+  }
 
   return {
-    process: toGanttArray(ganttProcess),
+    process: toGanttArray(handledProcess),
     turnround: executionTime[executionTime.length - 1],
   };
 };

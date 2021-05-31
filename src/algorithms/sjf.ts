@@ -61,9 +61,13 @@ const sjf = (processes: Process[], sobrecarga: number): Result => {
       }
     }
   }
-  const ganttProcess: Gantt[] = [];
-  addSobrecarga(handledProcess, sobrecarga, ganttProcess);
-  return { process: toGanttArray(ganttProcess), turnround: relogio };
+  if (sobrecarga > 0) {
+    const ganttProcess: Gantt[] = [];
+    addSobrecarga(handledProcess, sobrecarga, ganttProcess);
+    return { process: toGanttArray(ganttProcess), turnround: relogio };
+  }
+
+  return { process: toGanttArray(handledProcess), turnround: relogio };
 };
 
 export { sjf };

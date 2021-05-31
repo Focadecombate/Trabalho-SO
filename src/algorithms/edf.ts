@@ -111,22 +111,27 @@ const edf = (
       }
     }
   }
+  if (sobrecarga > 0) {
+    const ganttArray: Gantt[] = [];
 
-  const ganttArray: Gantt[] = [];
+    addSobrecargaQuantumEDF(executedProcess, sobrecarga, ganttArray);
 
-  addSobrecargaQuantumEDF(executedProcess, sobrecarga, ganttArray);
+    const removeDuplications = Array.from(new Set(ganttArray));
 
-  const removeDuplications = Array.from(new Set(ganttArray));
-
-  for (const process of removeDuplications) {
-    if (process.TaskName.includes("Sobrecarga")) {
-      sobrecargaFinal += 2;
+    for (const process of removeDuplications) {
+      if (process.TaskName.includes("Sobrecarga")) {
+        sobrecargaFinal += 2;
+      }
     }
+    return {
+      process: toGanttArray(removeDuplications),
+      turnround: clock + sobrecargaFinal,
+    };
   }
 
   return {
-    process: toGanttArray(removeDuplications),
-    turnround: clock + sobrecargaFinal,
+    process: toGanttArray(executedProcess),
+    turnround: clock,
   };
 };
 export { edf };
