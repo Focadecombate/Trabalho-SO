@@ -9,7 +9,7 @@ interface Props {
   deadline: [string, (value: string) => void];
   tempoExecucao: [string, (value: string) => void];
   priority: [string, (value: string) => void];
-  sobrescricaoDoSistema: [string, (value: string) => void];
+  sobrecargaDoSistema: [string, (value: string) => void];
   execute: (algo: string) => void;
   clear: () => void;
 }
@@ -29,9 +29,17 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
     justifyContent: "center",
   },
+  buttonContainer: {
+    display: "flex",
+    justifyContent: "space-evenly",
+    width: "33%",
+  },
+  marginTop: {
+    marginTop: "30px",
+  },
 }));
 
-const Algoritimos = ["SJF", "FIFO", "EDF", "Round-Robin", "Priority"];
+const algoritmos = ["SJF", "FIFO", "EDF", "Round-Robin", "Priority"];
 
 export const AlgorithmSelector = ({
   onSubmit,
@@ -40,7 +48,7 @@ export const AlgorithmSelector = ({
   tempoChegada,
   execute,
   tempoExecucao,
-  sobrescricaoDoSistema,
+  sobrecargaDoSistema,
   priority,
   clear,
 }: Props) => {
@@ -83,15 +91,15 @@ export const AlgorithmSelector = ({
       <Selector
         handleChange={handleChange}
         state={algorithm}
-        label="Algoritimos"
-        values={Algoritimos}
+        label="Algoritmos"
+        values={algoritmos}
       />
       <TextField
-        name="Sobrescrição do Sistema"
-        label="Sobrescrição do Sistema"
+        name="Sobrecarga do Sistema"
+        label="Sobrecarga do Sistema"
         variant="filled"
-        value={sobrescricaoDoSistema[0]}
-        onChange={(event) => sobrescricaoDoSistema[1](event.target.value)}
+        value={sobrecargaDoSistema[0]}
+        onChange={(event) => sobrecargaDoSistema[1](event.target.value)}
       />
       {showQuantum && (
         <TextField
@@ -102,6 +110,7 @@ export const AlgorithmSelector = ({
           onChange={(event) => quantum[1](event.target.value)}
         />
       )}
+
       <form className={classes.flex} onSubmit={onSubmit}>
         <TextField
           name="Tempo de Chegada"
@@ -136,14 +145,23 @@ export const AlgorithmSelector = ({
           />
         )}
 
-        <Button type="submit">Criar processo</Button>
+        <Button
+          className={classes.marginTop}
+          variant="contained"
+          color="primary"
+          type="submit"
+        >
+          Criar processo
+        </Button>
       </form>
-      <div>
+
+      <div className={classes.buttonContainer}>
         <Button
           type="button"
           variant="contained"
           color="primary"
           onClick={() => execute(algorithm)}
+          disabled={!algorithm}
         >
           Executar
         </Button>

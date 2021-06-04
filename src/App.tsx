@@ -30,11 +30,11 @@ function App() {
   const tempoExecucao = useState("");
   const priority = useState("");
   const deadLine = useState("");
-  const sobrescricaoDoSistema = useState("");
+  const sobrecargaDoSistema = useState("");
   const quantum = useState("");
 
   const execute = (algo: string) => {
-    const sobrecarga = parseInt(sobrescricaoDoSistema[0], 10);
+    const sobrecarga = parseInt(sobrecargaDoSistema[0], 10);
     setGanttProcess([]);
     switch (algo) {
       case "FIFO":
@@ -81,7 +81,7 @@ function App() {
       default:
         const { process: defaultProcess, turnround: defaultTurnRound } = fifo(
           processos,
-          parseInt(sobrescricaoDoSistema[0])
+          parseInt(sobrecargaDoSistema[0])
         );
         setGanttProcess(defaultProcess);
         setTurnRound(defaultTurnRound / defaultProcess.length);
@@ -121,7 +121,7 @@ function App() {
           tempoChegada={tempoChegada}
           tempoExecucao={tempoExecucao}
           priority={priority}
-          sobrescricaoDoSistema={sobrescricaoDoSistema}
+          sobrecargaDoSistema={sobrecargaDoSistema}
           clear={clearProcess}
         />
         <Typography variant="h5">Turnround:{turnRound}</Typography>
