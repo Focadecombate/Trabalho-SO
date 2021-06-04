@@ -1,9 +1,8 @@
 import { Process, Result } from "../@types";
 import { Gantt } from "../@types/gantt";
 import { createData, createGantt, toGanttArray } from "../utils/";
-import { addSobrecarga } from "../utils/addSobrecarga";
 
-export const fifo = (processes: Process[], sobrecarga: number): Result => {
+export const fifo = (processes: Process[]): Result => {
   /* Ordena os processos por tempo de entrada */
   const processosEmOrdem = processes
     .map((value, index) => ({
@@ -39,24 +38,17 @@ export const fifo = (processes: Process[], sobrecarga: number): Result => {
     (process, index): Gantt =>
       createGantt({
         TaskName: `Processo ${process.nProcesso}`,
-        StartDate: createData(process.tempoChegada + awaitTime[index]),
+        StartDate: createData(process.tempoChegada),
         EndDate: createData(executionTime[index]),
       })
   );
 
-  const ganttProcess: Gantt[] = [];
-
-  if (sobrecarga > 0) {
-    addSobrecarga(handledProcess, sobrecarga, ganttProcess);
-
-    return {
-      process: toGanttArray(ganttProcess),
-      turnround: executionTime[executionTime.length - 1],
-    };
-  }
+  const clock =
+    awaitTime.reduce((prev, curr) => prev + curr, 0) +
+    executionTime[executionTime.length - 1];
 
   return {
     process: toGanttArray(handledProcess),
-    turnround: executionTime[executionTime.length - 1],
+    turnround: clock,
   };
 };

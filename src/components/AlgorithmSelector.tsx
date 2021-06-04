@@ -55,6 +55,7 @@ export const AlgorithmSelector = ({
   const [algorithm, setAlgorithm] = useState("");
   const [showDeadline, setShowDeadline] = useState(false);
   const [showQuantum, setShowQuantum] = useState(false);
+  const [showSobrecarga, setShowSobrecarga] = useState(false);
   const [showPriority, setShowPriority] = useState(false);
 
   const handleChange = (event: ChangeEvent<{ value: unknown }>) => {
@@ -66,16 +67,19 @@ export const AlgorithmSelector = ({
       setShowDeadline(true);
       setShowPriority(false);
       setShowQuantum(true);
+      setShowSobrecarga(true);
       return;
     }
     if (algorithm === "Round-Robin") {
       setShowQuantum(true);
+      setShowSobrecarga(true);
       setShowPriority(false);
       setShowDeadline(false);
       return;
     }
     if (algorithm === "Priority") {
       setShowQuantum(false);
+      setShowSobrecarga(true);
       setShowDeadline(false);
       setShowPriority(true);
       return;
@@ -83,6 +87,7 @@ export const AlgorithmSelector = ({
     setShowPriority(false);
     setShowQuantum(false);
     setShowDeadline(false);
+    setShowSobrecarga(false);
   }, [algorithm]);
 
   const classes = useStyles();
@@ -94,13 +99,15 @@ export const AlgorithmSelector = ({
         label="Algoritmos"
         values={algoritmos}
       />
-      <TextField
-        name="Sobrecarga do Sistema"
-        label="Sobrecarga do Sistema"
-        variant="filled"
-        value={sobrecargaDoSistema[0]}
-        onChange={(event) => sobrecargaDoSistema[1](event.target.value)}
-      />
+      {showSobrecarga && (
+        <TextField
+          name="Sobrecarga do Sistema"
+          label="Sobrecarga do Sistema"
+          variant="filled"
+          value={sobrecargaDoSistema[0]}
+          onChange={(event) => sobrecargaDoSistema[1](event.target.value)}
+        />
+      )}
       {showQuantum && (
         <TextField
           name="Quantum"

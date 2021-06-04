@@ -8,6 +8,7 @@ import ProcessTable from "./components/ProcessTable";
 import { sjf } from "./algorithms/sjf";
 import { roundRobin } from "./algorithms/round-robin";
 import { edf } from "./algorithms/edf";
+import { priority as priorityAlgo } from "./algorithms/priority";
 
 const useStyles = makeStyles(() => ({
   flex: {
@@ -38,36 +39,32 @@ function App() {
     setGanttProcess([]);
     switch (algo) {
       case "FIFO":
-        const { process: fifoProcess, turnround: fifoTurnRound } = fifo(
-          processos,
-          sobrecarga
-        );
+        const { process: fifoProcess, turnround: fifoTurnRound } =
+          fifo(processos);
 
         setGanttProcess(fifoProcess);
-        setTurnRound(fifoTurnRound / (fifoProcess.length / 2));
+        setTurnRound(fifoTurnRound / processos.length);
         break;
       case "SJF":
-        const { process: sjfProcessos, turnround: sjfTurnRound } = sjf(
-          processos,
-          sobrecarga
-        );
+        const { process: sjfProcessos, turnround: sjfTurnRound } =
+          sjf(processos);
         setGanttProcess(sjfProcessos);
-        setTurnRound(sjfTurnRound / (sjfProcessos.length / 2));
+        setTurnRound(sjfTurnRound / processos.length);
         break;
       case "Priority":
         const { process: priorityProcessos, turnround: priorityTurnRound } =
-          sjf(processos, sobrecarga);
+          priorityAlgo(processos, sobrecarga);
         setGanttProcess(priorityProcessos);
-        setTurnRound(priorityTurnRound / (sjfProcessos.length / 2));
+        setTurnRound(priorityTurnRound / processos.length);
         break;
       case "EDF":
-        const { process: EDFprocess, turnround: EDFturnround } = edf(
+        const { process: EDProcess, turnround: EDTurnround } = edf(
           parseInt(quantum[0]),
           processos,
           sobrecarga
         );
-        setGanttProcess(EDFprocess);
-        setTurnRound(EDFturnround / EDFprocess.length);
+        setGanttProcess(EDProcess);
+        setTurnRound(EDTurnround / processos.length);
         break;
       case "Round-Robin":
         const { process: RRProcess, turnround: RRTurnRound } = roundRobin(
@@ -76,15 +73,13 @@ function App() {
           sobrecarga
         );
         setGanttProcess(RRProcess);
-        setTurnRound(RRTurnRound / RRProcess.length);
+        setTurnRound(RRTurnRound / processos.length);
         break;
       default:
-        const { process: defaultProcess, turnround: defaultTurnRound } = fifo(
-          processos,
-          parseInt(sobrecargaDoSistema[0])
-        );
+        const { process: defaultProcess, turnround: defaultTurnRound } =
+          fifo(processos);
         setGanttProcess(defaultProcess);
-        setTurnRound(defaultTurnRound / defaultProcess.length);
+        setTurnRound(defaultTurnRound / processos.length);
         break;
     }
   };
@@ -147,6 +142,7 @@ function App() {
           ]}
           options={{
             height: 400,
+
             animation: {
               duration: 1000,
               startup: true,
@@ -154,6 +150,11 @@ function App() {
             },
             gantt: {
               trackHeight: 30,
+              criticalPathEnabled: false,
+              arrow: {
+                width: 0,
+                color: "green",
+              },
             },
           }}
           rootProps={{ "data-testid": "2" }}

@@ -5,7 +5,6 @@ import {
   ProcessWithExecutedAndNumber,
 } from "../@types";
 import { createData, createGantt, toGanttArray } from "../utils";
-import { addSobrecarga } from "../utils/addSobrecarga";
 import { arrived } from "../utils/arrived";
 import { naoRodouTodos } from "../utils/naoRodouTodos";
 
@@ -61,7 +60,6 @@ const priority = (processes: Process[], sobrecarga: number): Result => {
   }
   if (sobrecarga > 0) {
     const ganttProcess: Gantt[] = [];
-    addSobrecarga(handledProcess, sobrecarga, ganttProcess);
     return { process: toGanttArray(ganttProcess), turnround: relogio };
   }
 

@@ -1,137 +1,160 @@
 import { Gantt, Process, Result } from "../@types";
-import { createData, createGantt, toGanttArray } from "../utils";
-import { addSobrecargaQuantumEDF } from "../utils/addSobrecargaQuantumEdf";
+import { createGanttQuantum, toGanttArray } from "../utils";
 import { arrived } from "../utils/arrived";
+
+import { checkPartialExecution as checkPartial } from "../utils/partialExecution";
 
 interface ProcessWithIdAndPartial extends Process {
   faltam: number;
-  nProcesso: number;
+  index: number;
+  executed: number[][];
 }
 
 export const checkPartialExecution = (processes: ProcessWithIdAndPartial[]) =>
   processes.some((value) => value.faltam > 0);
-
-const findSmallestDeadline = (
-  allProcess: ProcessWithIdAndPartial[],
-  nProcesso: number,
-  clock: number
-) => {
-  const filtered = allProcess
-    .filter((value) => value.faltam > 0)
-    .filter((value) => arrived(value.tempoChegada, clock))
-    .sort((esquerda, direira) => esquerda.deadLine - direira.deadLine);
-
-  const isSmallest = filtered.reduce((acc, loc) =>
-    acc.deadLine < loc.deadLine ? acc : loc
-  );
-
-  return isSmallest.nProcesso === nProcesso;
-};
-
-interface Run {
-  aditionalTime: number;
-  currentPartial: number;
-  clock: number;
-  element: ProcessWithIdAndPartial;
-  counter: number;
-  executedProcess: Gantt[];
-}
-
-const run = ({
-  aditionalTime,
-  clock,
-  element,
-  counter,
-  executedProcess,
-}: Run) => {
-  executedProcess.push(
-    createGantt({
-      TaskName: `Processo ${element.nProcesso}`,
-      TaskID: `${counter} Processo ${element.nProcesso}`,
-      StartDate: createData(clock),
-      EndDate: createData(clock + aditionalTime),
-    })
-  );
-};
 
 const edf = (
   quantum: number,
   processes: Process[],
   sobrecarga: number
 ): Result => {
+  /* Array com o que falta ser executado de cada processo */
+
   const sortedProcess = processes
     .map((value, index) => ({
       ...value,
       faltam: value.tempoExecucao,
-      nProcesso: index,
+      index,
+      executed: [[0, 0]],
     }))
     .sort((esquerda, direita) => esquerda.deadLine - direita.deadLine);
 
-  let counter = 0;
+  let partialExecution = processes.map((process) => process.tempoExecucao);
+
   let clock = 0;
   let sobrecargaFinal = 0;
-
-  const executedProcess: Gantt[] = [];
-
-  /* Loop enquanto tiver algum processo sem estar completo */
-  while (checkPartialExecution(sortedProcess)) {
-    /* Loop pelos processo */
+  const executedTimer: number[] = [];
+  /* While que executa enquanto há processos que não foram executados por completo */
+  while (checkPartial(partialExecution)) {
+    /* loop que executa a lógica */
     for (let index = 0; index < sortedProcess.length; index++) {
-      const element = sortedProcess[index];
-      const currentPartial = element.faltam;
-
-      const smallestDeadLine = findSmallestDeadline(
-        sortedProcess,
-        element.nProcesso,
-        clock
-      );
+      /* Checa se ainda há tempo faltando e se o processo já chegou na fila */
+      const currentPartial = partialExecution[index];
+      const currentProcess = sortedProcess[index];
 
       const canRun =
-        arrived(element.tempoChegada, clock) &&
-        element.faltam > 0 &&
-        smallestDeadLine;
+        arrived(currentProcess.tempoChegada, clock) && currentPartial;
 
-      /* Checa se o processo já chegou e se ainda falta executar */
       if (canRun) {
         /* Tempo adicional que pode ser o quantum ou o tempo que falta no processo */
-        const aditionalTime =
+        const additionalTime =
           quantum > currentPartial ? currentPartial : quantum;
-        run({
-          aditionalTime,
-          currentPartial,
-          clock,
-          element,
-          counter,
-          executedProcess,
-        });
-        element.faltam = currentPartial - aditionalTime;
-        clock += aditionalTime;
-        counter++;
-        continue;
+
+        const updatedPartial = currentPartial - additionalTime;
+        clock += additionalTime;
+        currentProcess.executed.push([clock, additionalTime]);
+        partialExecution[index] = updatedPartial;
       }
     }
   }
+
+  const executedProcess = sortedProcess.map((process) => {
+    const executedTime = process.executed.reduce(
+      (prev, curr) => prev + curr[1],
+      0
+    );
+
+    executedTimer.push(
+      process.executed[process.executed.length - 1][0] - process.tempoChegada
+    );
+
+    const StartDate = process.tempoChegada;
+    const EndDate = process.tempoChegada + executedTime;
+
+    return createGanttQuantum({
+      TaskName: `Processo ${process.index}`,
+      StartDate,
+      EndDate,
+      Duration: quantum,
+    });
+  });
+
+  const totalAwaitTime =
+    executedTimer.reduce((prev, curr) => prev + curr, 0) - clock - 1;
+
   if (sobrecarga > 0) {
-    const ganttArray: Gantt[] = [];
+    const ganttArray = executedProcess
+      .map((process, index, array) => {
+        const { StartDate, EndDate } = process;
 
-    addSobrecargaQuantumEDF(executedProcess, sobrecarga, ganttArray);
+        const Duration = (EndDate - StartDate) * 1000;
 
-    const removeDuplications = Array.from(new Set(ganttArray));
+        const sobrecargaBase = {
+          TaskID: `Sobrecarga ${index}`,
+          TaskName: `Sobrecarga ${index}`,
+          StartDate: null,
+          EndDate: null,
+          Duration: sobrecarga * 1000,
+          PercentComplete: 100,
+        };
 
-    for (const process of removeDuplications) {
+        if (index === array.length - 1) {
+          return [
+            {
+              ...process,
+              EndDate: null,
+              StartDate: null,
+              Duration: Duration,
+              Dependencies: `Sobrecarga ${index - 1}`,
+            },
+          ];
+        }
+        if (index === 0) {
+          return [
+            {
+              ...process,
+              StartDate: null,
+              EndDate: null,
+              Duration: Duration,
+            },
+            {
+              ...sobrecargaBase,
+              Dependencies: process.TaskID,
+            },
+          ];
+        }
+        return [
+          {
+            ...process,
+            StartDate: null,
+            EndDate: null,
+            Duration: Duration,
+            Dependencies: `Sobrecarga ${index - 1}`,
+          },
+          {
+            ...sobrecargaBase,
+            Dependencies: array[index].TaskID,
+          },
+        ];
+      })
+      .flat();
+
+    for (const process of ganttArray) {
       if (process.TaskName.includes("Sobrecarga")) {
-        sobrecargaFinal += 2;
+        sobrecargaFinal += sobrecarga;
       }
     }
+
     return {
-      process: toGanttArray(removeDuplications),
-      turnround: clock + sobrecargaFinal,
+      process: toGanttArray(ganttArray as unknown as Gantt[]),
+      turnround: clock + sobrecargaFinal + totalAwaitTime,
     };
   }
 
   return {
-    process: toGanttArray(executedProcess),
-    turnround: clock,
+    process: toGanttArray(executedProcess as unknown as Gantt[]),
+    turnround: clock + totalAwaitTime,
   };
 };
+
 export { edf };
