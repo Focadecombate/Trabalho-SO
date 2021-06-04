@@ -3,8 +3,8 @@ import React, { useState, FormEvent } from "react";
 import { GanttArray, Process } from "./@types";
 import Chart from "react-google-charts";
 import { fifo } from "./algorithms/fifo";
-import { AlgorithmSelector } from "./components/algorithmSelector";
-import ProcessTable from "./components/processTable";
+import { AlgorithmSelector } from "./components/AlgorithmSelector";
+import ProcessTable from "./components/ProcessTable";
 import { sjf } from "./algorithms/sjf";
 import { roundRobin } from "./algorithms/round-robin";
 import { edf } from "./algorithms/edf";
@@ -24,13 +24,13 @@ function App() {
   const [processos, setProcessos] = useState<Process[]>([]);
   const [ganttProcess, setGanttProcess] = useState<GanttArray[]>([]);
 
-  const tempoChegada = useState("");
+  const tempoChegada = useState("0");
   const [turnRound, setTurnRound] = useState(0);
 
-  const tempoExecucao = useState("");
+  const tempoExecucao = useState("0");
   const priority = useState("");
   const deadLine = useState("");
-  const sobrecargaDoSistema = useState("");
+  const sobrecargaDoSistema = useState("0");
   const quantum = useState("");
 
   const execute = (algo: string) => {

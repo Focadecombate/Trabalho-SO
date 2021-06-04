@@ -35,7 +35,9 @@ export const Selector = ({ values, state, label, handleChange }: Props) => {
       <InputLabel>{label}</InputLabel>
       <Select value={state} onChange={handleChange}>
         {values.map((arrayValue) => (
-          <MenuItem value={arrayValue}>{arrayValue}</MenuItem>
+          <MenuItem key={arrayValue} value={arrayValue}>
+            {arrayValue}
+          </MenuItem>
         ))}
       </Select>
     </FormControl>

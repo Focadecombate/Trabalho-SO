@@ -1,6 +1,6 @@
 import { Container, TextField, Button, makeStyles } from "@material-ui/core";
 import { FormEvent, useState, ChangeEvent, useEffect } from "react";
-import { Selector } from "./selector";
+import { Selector } from "./Selector";
 
 interface Props {
   onSubmit(e: FormEvent): void;
@@ -150,6 +150,7 @@ export const AlgorithmSelector = ({
           variant="contained"
           color="primary"
           type="submit"
+          disabled={!algorithm}
         >
           Criar processo
         </Button>
@@ -161,7 +162,6 @@ export const AlgorithmSelector = ({
           variant="contained"
           color="primary"
           onClick={() => execute(algorithm)}
-          disabled={!algorithm}
         >
           Executar
         </Button>
