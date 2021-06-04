@@ -8,6 +8,7 @@ import ProcessTable from "./components/ProcessTable";
 import { sjf } from "./algorithms/sjf";
 import { roundRobin } from "./algorithms/round-robin";
 import { edf } from "./algorithms/edf";
+import { priority as priorityFunc } from "./algorithms/priority";
 
 const useStyles = makeStyles(() => ({
   flex: {
@@ -56,9 +57,9 @@ function App() {
         break;
       case "Priority":
         const { process: priorityProcessos, turnround: priorityTurnRound } =
-          sjf(processos, sobrecarga);
+          priorityFunc(processos, sobrecarga);
         setGanttProcess(priorityProcessos);
-        setTurnRound(priorityTurnRound / (sjfProcessos.length / 2));
+        setTurnRound(priorityTurnRound / (priorityProcessos.length / 2));
         break;
       case "EDF":
         const { process: EDFprocess, turnround: EDFturnround } = edf(
