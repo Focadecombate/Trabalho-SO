@@ -87,6 +87,7 @@ function App() {
   const clearProcess = () => {
     setProcessos([]);
     setGanttProcess([]);
+    setTurnRound(0);
   };
 
   function onSubmit(e: FormEvent) {

@@ -1,18 +1,20 @@
 import { Gantt, GanttArray } from "../@types/gantt";
 
+interface createGanttProps {
+  TaskName: string;
+  StartDate: Date;
+  EndDate: Date;
+  TaskID?: string;
+  Duration?: number;
+}
+
 export const createGantt = ({
   TaskName,
   StartDate,
   EndDate,
   Duration,
   TaskID,
-}: {
-  TaskName: string;
-  StartDate: Date;
-  EndDate: Date;
-  TaskID?: string;
-  Duration?: number;
-}): Gantt => ({
+}: createGanttProps): Gantt => ({
   TaskID: TaskID ?? TaskName,
   TaskName,
   StartDate,

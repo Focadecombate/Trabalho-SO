@@ -33,6 +33,7 @@ export default function ProcessTable({ process }: Props) {
             <TableCell>Tempo de Chegada</TableCell>
             <TableCell>Tempo de Execução</TableCell>
             <TableCell>Deadline</TableCell>
+            <TableCell>Prioridade</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -44,6 +45,7 @@ export default function ProcessTable({ process }: Props) {
               <TableCell>{row.tempoChegada}</TableCell>
               <TableCell>{row.tempoExecucao}</TableCell>
               <TableCell>{row.deadLine}</TableCell>
+              <TableCell>{row.priority}</TableCell>
             </TableRow>
           ))}
         </TableBody>
